@@ -1,0 +1,60 @@
+#+TITLE: CMake 101
+#+AUTHOR: Lukas Waymann
+
+#+LANGUAGE: en
+#+REVEAL_THEME: night
+#+REVEAL_EXTRA_CSS: extra.css
+#+REVEAL_HIGHLIGHT_CSS: ir-black.css
+#+REVEAL_PLUGINS: (highlight notes)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+OPTIONS: reveal_control:nil num:nil toc:nil reveal_title_slide:"<h1>%t</h1>"
+
+#+REVEAL_TITLE_SLIDE_BACKGROUND: cmake-logo.svg
+#+REVEAL_TITLE_SLIDE_BACKGROUND_SIZE: 58%
+
+# XXX: this only works when `org-export-allow-bind-keywords` is non-`nil`.  See
+# http://orgmode.org/org.html#index-g_t_0023_002bBIND-1631
+#+BIND: org-html-metadata-timestamp-format "%Y-%m-%d"
+
+* What is CMake?
+- Build automation tool
+  - Probably the most popular cross-platform build tool for C++ right now
+- Takes care of invoking the compiler and linker for the correct files in the correct sequence with the correct arguments
+* Main Features
+- Cross-platform
+  - Generates makefiles on Unices
+  - Generates VS project files when using Visual Studio
+- Easier than handwriting makefiles
+- Dependency tree is generated from the code
+  - Partial rebuilds (indispensable for C++)
+- Out-of-place builds
+  - Good when building with different optimization flags and for different architectures
+- Locates libraries
+* Demonstration
+  #+BEGIN_NOTES
+  - Instructions for CMake go int ~CMakeLists.txt~
+  #+END_NOTES
+** ~CMakeLists.txt~ from the demo
+   #+BEGIN_SRC CMake
+   cmake_minimum_required(VERSION 3.9.4)
+   project(HelloWorld)
+   file(GLOB SOURCES "*.cpp")
+   add_executable(hello_world ${SOURCES})
+   #+END_SRC
+*** 
+    #+BEGIN_NOTES
+    https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html
+    https://stackoverflow.com/questions/35550116/which-cmake-version-as-the-minimum
+    #+END_NOTES
+    If the version of CMake used is older than 3.9.4, exit and report an error:
+    #+BEGIN_SRC CMake
+    cmake_minimum_required(VERSION 3.9.4)
+    #+END_SRC
+    #+REVEAL_HTML: <div style="padding:15px"/>
+    - This is preferable to failing with a cryptic error message later.
+    - Ideally we would specify the oldest version supporting all features used
+      but in practice the /oldest tested version/ is OK.
+*** 
+    #+BEGIN_SRC CMake
+    project(HelloWorld)
+    #+END_SRC
