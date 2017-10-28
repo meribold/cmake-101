@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>CMake 101</title>
+<meta name="author" content="(Lukas Waymann)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="./reveal.js/css/reveal.css"/>
+
+<link rel="stylesheet" href="./reveal.js/css/theme/night.css" id="theme"/>
+
+<link rel="stylesheet" href="extra.css"/>
+<link rel="stylesheet" href="ir-black.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = './reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide" data-background="cmake-logo.svg" data-background-size="58%"><h1>CMake 101</h1>
+</section>
+
+<section>
+<section id="slide-org6de2c4a">
+<h2 id="org6de2c4a">What is CMake?</h2>
+<ul>
+<li>Build automation tool
+<ul>
+<li>Probably the most popular cross-platform build tool for C++ right now</li>
+
+</ul></li>
+<li>Takes care of invoking the compiler and linker for the correct files in the correct sequence with the correct arguments</li>
+
+</ul>
+</section>
+<section id="slide-org5af7151">
+<h3 id="org5af7151">Main Features</h3>
+<ul>
+<li>Cross-platform
+<ul>
+<li>Generates makefiles on Unices</li>
+<li>Generates VS project files when using Visual Studio</li>
+
+</ul></li>
+<li>Easier than handwriting makefiles</li>
+<li>Dependency tree is generated from the code
+<ul>
+<li>Partial rebuilds (indispensable for C++)</li>
+
+</ul></li>
+<li>Out-of-place builds
+<ul>
+<li>Good when building with different optimization flags and for different architectures</li>
+
+</ul></li>
+<li>Locates libraries</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orga89b861">
+<h2 id="orga89b861">Demonstration</h2>
+<aside class="notes">
+<ul>
+<li>Instructions for CMake go int <code>CMakeLists.txt</code></li>
+
+</ul>
+
+</aside>
+</section>
+<section id="slide-orgcdb1b73">
+<h3 id="orgcdb1b73">Final <code>CMakeLists.txt</code> from the demo</h3>
+<div class="org-src-container">
+
+<pre><code class="CMake" >cmake_minimum_required(VERSION 3.9.4)
+project(HelloWorld)
+
+set(CMAKE_CXX_STANDARD 14)
+
+# Enable some warnings.  See &lt;https://stackoverflow.com/a/14235055&gt;.
+if (CMAKE_COMPILER_IS_GNUCC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+endif (CMAKE_COMPILER_IS_GNUCC)
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+endif (MSVC)
+
+file(GLOB SOURCES "src/*.cpp")
+add_executable(hello ${SOURCES})
+find_package(Boost REQUIRED COMPONENTS filesystem)
+target_link_libraries(hello Boost::filesystem)
+</code></pre>
+</div>
+</section>
+<section id="slide-orgdcb236d">
+<h4 id="orgdcb236d"></h4>
+<aside class="notes">
+<p>
+<a href="https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html">https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html</a>
+<a href="https://stackoverflow.com/questions/35550116/which-cmake-version-as-the-minimum">https://stackoverflow.com/questions/35550116/which-cmake-version-as-the-minimum</a>
+</p>
+
+</aside>
+<p>
+If the version of CMake used is older than 3.9.4, exit and report an error.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >cmake_minimum_required(VERSION 3.9.4)
+</code></pre>
+</div>
+<div style="padding:15px"/>
+<ul>
+<li>This is preferable to failing with a cryptic error message later.</li>
+<li>Ideally we would specify the oldest version supporting all features used,
+but in practice the <i>oldest tested version</i> is OK.</li>
+
+</ul>
+</section>
+<section id="slide-org01b2160">
+<h4 id="org01b2160"></h4>
+<aside class="notes">
+<p>
+<a href="https://cmake.org/cmake/help/latest/command/project.html">https://cmake.org/cmake/help/latest/command/project.html</a>
+</p>
+
+</aside>
+<p>
+Set the <code>PROJECT_NAME</code> variable to <code>HelloWorld</code>.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >project(HelloWorld)
+</code></pre>
+</div>
+<div style="padding:15px"/>
+<ul>
+<li>Sets some other variables too.</li>
+<li>Also supports optional arguments for specifying a version number and which
+languages should be enabled.</li>
+<li>Doesn't seem to do anything too interesting.</li>
+<li>A call of the <code>project()</code> command is added implicitly if missing.</li>
+
+</ul>
+</section>
+<section id="slide-orged31e17">
+<h4 id="orged31e17"></h4>
+<p>
+Specify that we want to use C++14.  CMake will invoke the compiler
+with appropriate options.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >set(CMAKE_CXX_STANDARD 14)
+</code></pre>
+</div>
+</section>
+<section id="slide-orgd84a356">
+<h4 id="orgd84a356"></h4>
+<p>
+Enable some warnings.  See <a href="https://stackoverflow.com/a/14235055">https://stackoverflow.com/a/14235055</a>.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >if (CMAKE_COMPILER_IS_GNUCC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+endif (CMAKE_COMPILER_IS_GNUCC)
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+endif (MSVC)
+</code></pre>
+</div>
+</section>
+<section id="slide-org4be56c0">
+<h4 id="org4be56c0"></h4>
+<aside class="notes">
+<p>
+<a href="https://cmake.org/cmake/help/latest/command/file.html">https://cmake.org/cmake/help/latest/command/file.html</a>
+</p>
+
+</aside>
+<p>
+Generate a list of files that match <code>src/*.cpp</code> and store it in a
+variable called <code>SOURCES</code>.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >file(GLOB SOURCES "src/*.cpp")
+</code></pre>
+</div>
+</section>
+<section id="slide-orgb1563ce">
+<h4 id="orgb1563ce"></h4>
+<aside class="notes">
+<p>
+<a href="https://cmake.org/cmake/help/latest/command/add_executable.html">https://cmake.org/cmake/help/latest/command/add_executable.html</a>
+</p>
+
+</aside>
+<p>
+Generate an executable called <code>hello</code> (presumably <code>hello.exe</code> on
+Windows) from the source files named by the <code>SOURCES</code> variable.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >add_executable(hello ${SOURCES})
+</code></pre>
+</div>
+</section>
+<section id="slide-orgfd02916">
+<h4 id="orgfd02916"></h4>
+<aside class="notes">
+<p>
+<a href="https://cmake.org/Wiki/CMake:How_To_Find_Libraries">https://cmake.org/Wiki/CMake:How_To_Find_Libraries</a>
+<a href="https://cmake.org/cmake/help/latest/command/find_package.html">https://cmake.org/cmake/help/latest/command/find_package.html</a>
+<a href="https://cmake.org/cmake/help/latest/module/FindBoost.html">https://cmake.org/cmake/help/latest/module/FindBoost.html</a>
+<a href="https://cmake.org/cmake/help/latest/command/target_link_libraries.html">https://cmake.org/cmake/help/latest/command/target_link_libraries.html</a>
+</p>
+
+</aside>
+<p>
+Use a <a href="http://www.boost.org">Boost</a> library (Filesystem).  CMake
+has a module that helps finding Boost libraries which is used
+here.
+</p>
+<div class="org-src-container">
+
+<pre><code class="CMake" >find_package(Boost REQUIRED COMPONENTS filesystem)
+target_link_libraries(hello Boost::filesystem)
+</code></pre>
+</div>
+<div style="padding:15px"/>
+<ul>
+<li>The <code>REQUIRED</code> option tells CMake to stop processing if Boost.Filesystem
+can't be found.</li>
+<li>After <code>COMPONENTS</code>, we tell CMake that we specifically want to link against
+the Filesystem Library.</li>
+<li>The second line will cause the appropriate option for linking against
+Boost.Filesystem to be appended to the linker command for
+creating the <code>hello</code> executable.</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orga77002d" data-background="http://orgmode.org/img/org-mode-unicorn-logo.svg" data-background-size="150px 160px" data-background-repeat="repeat">
+<h2 id="orga77002d"></h2>
+
+<div class="figure">
+<p><img src="https://stallman.org/saintignucius.jpg" alt="saintignucius.jpg" />
+</p>
+<p><span class="figure-number">Figure 1: </span>"I bless your computer, my child!"</p>
+</div>
+</section>
+</section>
+</div>
+</div>
+<script src="./reveal.js/lib/js/head.min.js"></script>
+<script src="./reveal.js/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: false,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: './reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: './reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>
