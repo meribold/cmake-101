@@ -8,8 +8,7 @@
 
 /* Make the background a bit darker than the default of `night.css`. */
 body {
-    background: #060606;
-    background-color: #060606;
+    background: #000;
 }
 
 .reveal {
@@ -53,7 +52,16 @@ body {
 }
 
 .reveal pre code {
+    background: #111;
+    border-radius: .3em;
     max-height: unset;
+    padding: .3em !important;
+}
+
+code {
+    background: #111;
+    border-radius: .3em;
+    padding: .2em !important;
 }
 
 /* .hljs { */
