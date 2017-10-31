@@ -13,3 +13,5 @@ endif (MSVC)
 
 file(GLOB SOURCES "src/*.cpp")
 add_executable(hello ${SOURCES})
+find_package(Boost REQUIRED COMPONENTS filesystem)
+target_link_libraries(hello Boost::filesystem)
