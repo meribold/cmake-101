@@ -43,10 +43,10 @@
 
    # Enable some warnings.  See <https://stackoverflow.com/a/14235055>.
    if (CMAKE_COMPILER_IS_GNUCC)
-   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
    endif (CMAKE_COMPILER_IS_GNUCC)
    if (MSVC)
-   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
+     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
    endif (MSVC)
 
    file(GLOB SOURCES "src/*.cpp")
@@ -63,22 +63,25 @@
     #+END_SRC
     #+REVEAL_HTML: <div style="padding:15px"/>
     - This is preferable to failing with a cryptic error message later.
-    - Ideally we would specify the oldest version supporting all features used
+    - Ideally we would specify the oldest version supporting all features used,
       but in practice the /oldest tested version/ is OK.
 *** 
     #+BEGIN_NOTES
     https://cmake.org/cmake/help/latest/command/project.html
     #+END_NOTES
+    Set the ~PROJECT_NAME~ variable to ~HelloWorld~.
     #+BEGIN_SRC CMake
     project(HelloWorld)
     #+END_SRC
     #+REVEAL_HTML: <div style="padding:15px"/>
-    - Sets some variables.  
-    - A call of the ~project()~ command is added implicitly if missing.
+    - Sets some other variables too.
+    - Also supports optional arguments for specifying a version number and which
+      languages should be enabled.
     - Doesn't seem to do anything too interesting.
+    - A call of the ~project()~ command is added implicitly if missing.
 *** 
-    Specify that we want to use C++14.  CMake will add the appropriate
-    options for the compiler used.
+    Specify that we want to use C++14.  CMake will invoke the compiler
+    with appropriate options.
     #+BEGIN_SRC CMake
     set(CMAKE_CXX_STANDARD 14)
     #+END_SRC
@@ -86,17 +89,27 @@
     Enable some warnings.  See [[https://stackoverflow.com/a/14235055]].
     #+BEGIN_SRC CMake
     if (CMAKE_COMPILER_IS_GNUCC)
-	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+      set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     endif (CMAKE_COMPILER_IS_GNUCC)
     if (MSVC)
-	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
+      set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
     endif (MSVC)
     #+END_SRC
 *** 
+    #+BEGIN_NOTES
+    [[https://cmake.org/cmake/help/latest/command/file.html]]
+    #+END_NOTES
+    Generate a list of files that match ~src/*.cpp~ and store it in a
+    variable called ~SOURCES~.
     #+BEGIN_SRC CMake
-    file(GLOB SOURCES "*.cpp")
+    file(GLOB SOURCES "src/*.cpp")
     #+END_SRC
 *** 
+    Generate an executable called ~hello~ (presumably ~hello.exe~ on
+    Windows) from the source files named by the ~SOURCES~ variable.
+    #+BEGIN_NOTES
+    [[https://cmake.org/cmake/help/latest/command/add_executable.html]]
+    #+END_NOTES
     #+BEGIN_SRC CMake
     add_executable(hello ${SOURCES})
     #+END_SRC
