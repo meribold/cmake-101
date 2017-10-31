@@ -20,16 +20,16 @@
 - Build automation tool
   - Probably the most popular cross-platform build tool for C++ right now
 - Takes care of invoking the compiler and linker for the correct files in the correct sequence with the correct arguments
-* Main Features
-- Cross-platform
-  - Generates makefiles on Unices
-  - Generates VS project files when using Visual Studio
-- Easier than handwriting makefiles
-- Dependency tree is generated from the code
-  - Partial rebuilds (indispensable for C++)
-- Out-of-place builds
-  - Good when building with different optimization flags and for different architectures
-- Locates libraries
+** Main Features
+ - Cross-platform
+   - Generates makefiles on Unices
+   - Generates VS project files when using Visual Studio
+ - Easier than handwriting makefiles
+ - Dependency tree is generated from the code
+   - Partial rebuilds (indispensable for C++)
+ - Out-of-place builds
+   - Good when building with different optimization flags and for different architectures
+ - Locates libraries
 * Demonstration
   #+BEGIN_NOTES
   - Instructions for CMake go int ~CMakeLists.txt~
@@ -51,6 +51,8 @@
 
    file(GLOB SOURCES "src/*.cpp")
    add_executable(hello ${SOURCES})
+   find_package(Boost REQUIRED COMPONENTS filesystem)
+   target_link_libraries(hello Boost::filesystem)
    #+END_SRC
 *** 
     #+BEGIN_NOTES
@@ -105,14 +107,36 @@
     file(GLOB SOURCES "src/*.cpp")
     #+END_SRC
 *** 
-    Generate an executable called ~hello~ (presumably ~hello.exe~ on
-    Windows) from the source files named by the ~SOURCES~ variable.
     #+BEGIN_NOTES
     [[https://cmake.org/cmake/help/latest/command/add_executable.html]]
     #+END_NOTES
+    Generate an executable called ~hello~ (presumably ~hello.exe~ on
+    Windows) from the source files named by the ~SOURCES~ variable.
     #+BEGIN_SRC CMake
     add_executable(hello ${SOURCES})
     #+END_SRC
+*** 
+    #+BEGIN_NOTES
+    [[https://cmake.org/Wiki/CMake:How_To_Find_Libraries]]
+    [[https://cmake.org/cmake/help/latest/command/find_package.html]]
+    [[https://cmake.org/cmake/help/latest/module/FindBoost.html]]
+    [[https://cmake.org/cmake/help/latest/command/target_link_libraries.html]]
+    #+END_NOTES
+    Use a [[http://www.boost.org][Boost]] library (Filesystem).  CMake
+    has a module that helps finding Boost libraries which is used
+    here.
+    #+BEGIN_SRC CMake
+    find_package(Boost REQUIRED COMPONENTS filesystem)
+    target_link_libraries(hello Boost::filesystem)
+    #+END_SRC
+    #+REVEAL_HTML: <div style="padding:15px"/>
+    - The ~REQUIRED~ option tells CMake to stop processing if Boost.Filesystem
+      can't be found.
+    - After ~COMPONENTS~, we tell CMake that we specifically want to link against
+      the Filesystem Library.
+    - The second line will cause the appropriate option for linking against
+      Boost.Filesystem to be appended to the linker command for
+      creating the ~hello~ executable.
 * 
   :PROPERTIES:
   :reveal_background: http://orgmode.org/img/org-mode-unicorn-logo.svg
